@@ -1,0 +1,6 @@
+{
+  "name": "ax-champion-bot",
+  "framework": "nextjs",
+  "registry": "oci.wntd.co/backyard/ax-champion-bot",
+  "createdAt": "2026-05-07T00:00:00.000Z"
+}
