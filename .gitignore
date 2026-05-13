@@ -14,3 +14,6 @@ dist
 next-env.d.ts
 tsconfig.tsbuildinfo
 .claude/
+by_token.txt
+*.swp
+*.swo
