@@ -3,7 +3,7 @@ import { z } from "zod";
 const envSchema = z.object({
   SLACK_BOT_TOKEN: z.string().startsWith("xoxb-"),
   SLACK_SIGNING_SECRET: z.string().optional(),
-  SLACK_CHANNEL_ID: z.string().startsWith("C"),
+  SLACK_AX_CHANNEL_ID: z.string().startsWith("C"),
   SLACK_ADMIN_USER_ID: z.string().startsWith("U"),
   SLACK_AI_JUBJUB_CHANNEL_ID: z.string().startsWith("C").optional(),
 

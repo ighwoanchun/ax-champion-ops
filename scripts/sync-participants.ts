@@ -18,7 +18,7 @@ async function main() {
   const e = env();
 
   console.log("[sync] fetching channel members...");
-  const memberIds = await listChannelMembers(e.SLACK_CHANNEL_ID);
+  const memberIds = await listChannelMembers(e.SLACK_AX_CHANNEL_ID);
   console.log(`[sync] ${memberIds.length} members found.`);
 
   // Slack 사용자 정보 일괄 조회

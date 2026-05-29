@@ -20,6 +20,15 @@ export async function postMessage(input: {
   blocks?: unknown[];
 }): Promise<{ ts?: string; channel?: string; dryRun: boolean }> {
   const e = env();
+  // ai-줍줍 채널은 참가자 자발적 게시 영역. 봇은 read-only.
+  if (
+    e.SLACK_AI_JUBJUB_CHANNEL_ID &&
+    input.channel === e.SLACK_AI_JUBJUB_CHANNEL_ID
+  ) {
+    throw new Error(
+      "[slack] postMessage to ai-jubjub channel is forbidden (read-only policy)",
+    );
+  }
   if (e.DRY_RUN) {
     const wrapped = `[DRY_RUN → 원래 대상: ${input.channel}]\n${input.text}`;
     const r = await slack().chat.postMessage({

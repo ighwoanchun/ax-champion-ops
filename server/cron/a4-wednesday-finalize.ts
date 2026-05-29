@@ -69,13 +69,13 @@ export async function runA4(now: Date = new Date()): Promise<void> {
   const idToName = new Map(active.map((p) => [p.slackUserId, p.name]));
 
   const channelMembers = new Set(
-    await listChannelMembers(e.SLACK_CHANNEL_ID),
+    await listChannelMembers(e.SLACK_AX_CHANNEL_ID),
   );
   const expected = active.filter((p) => channelMembers.has(p.slackUserId));
 
   const since = todayMidnightKstAsUnixTs(now);
   const messages = await fetchChannelMessagesSince(
-    e.SLACK_CHANNEL_ID,
+    e.SLACK_AX_CHANNEL_ID,
     since,
   );
 
@@ -126,6 +126,49 @@ export async function runA4(now: Date = new Date()): Promise<void> {
     dropoutSignalCount: 0,
   });
 
+  // ai-줍줍 게시 카운트 트래킹 (지난 7일).
+  // SLACK_AI_JUBJUB_CHANNEL_ID가 주입된 경우에만 실행. 실패해도 A4 전체를 막지 않음.
+  const AI_JUBJUB_REQUIRED = 2;
+  let aiJubjubStats: {
+    total: number;
+    requiredPerPerson: number;
+    missed: { name: string; count: number }[];
+  } | undefined;
+  if (e.SLACK_AI_JUBJUB_CHANNEL_ID && active.length > 0) {
+    try {
+      const sevenDaysAgoTs = (
+        (now.getTime() - 7 * 24 * 60 * 60 * 1000) /
+        1000
+      ).toFixed(6);
+      const jubjubMessages = await fetchChannelMessagesSince(
+        e.SLACK_AI_JUBJUB_CHANNEL_ID,
+        sevenDaysAgoTs,
+      );
+      const counts = new Map<string, number>();
+      for (const p of active) counts.set(p.slackUserId, 0);
+      for (const m of jubjubMessages) {
+        if (!m.user) continue;
+        if (counts.has(m.user)) {
+          counts.set(m.user, (counts.get(m.user) ?? 0) + 1);
+        }
+      }
+      const totalPosts = Array.from(counts.values()).reduce((a, b) => a + b, 0);
+      const missed = active
+        .filter((p) => (counts.get(p.slackUserId) ?? 0) < AI_JUBJUB_REQUIRED)
+        .map((p) => ({
+          name: p.name,
+          count: counts.get(p.slackUserId) ?? 0,
+        }));
+      aiJubjubStats = {
+        total: totalPosts,
+        requiredPerPerson: AI_JUBJUB_REQUIRED,
+        missed,
+      };
+    } catch (err) {
+      console.error("[A4] ai-jubjub fetch failed (continuing):", err);
+    }
+  }
+
   // 운영진 DM
   await notifyAdmin(
     msgFinalizeAdminReport({
@@ -134,6 +177,7 @@ export async function runA4(now: Date = new Date()): Promise<void> {
       submittedCount,
       totalCount,
       unsubmittedNames,
+      aiJubjubStats,
     }),
   );
 
@@ -146,6 +190,12 @@ export async function runA4(now: Date = new Date()): Promise<void> {
       submitted: submittedCount,
       missed: missedCount,
       scrumDate,
+      aiJubjub: aiJubjubStats
+        ? {
+            total: aiJubjubStats.total,
+            missedCount: aiJubjubStats.missed.length,
+          }
+        : null,
     },
   });
 

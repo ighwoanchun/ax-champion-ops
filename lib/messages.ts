@@ -82,6 +82,11 @@ export function msgFinalizeAdminReport(input: {
   submittedCount: number;
   totalCount: number;
   unsubmittedNames: string[];
+  aiJubjubStats?: {
+    total: number;
+    requiredPerPerson: number;
+    missed: { name: string; count: number }[];
+  };
 }): string {
   const lines = [
     `📊 *W${input.weekNumber} 슬랙 스크럼 마감 요약 (${fmtKstDate(input.scrumDate)} 18:00)*`,
@@ -91,6 +96,20 @@ export function msgFinalizeAdminReport(input: {
     lines.push(`미제출자: ${input.unsubmittedNames.join(", ")}`);
   } else {
     lines.push("✅ 전원 제출 완료");
+  }
+  if (input.aiJubjubStats) {
+    const s = input.aiJubjubStats;
+    lines.push("");
+    lines.push("📤 *ai-줍줍 게시 현황 (지난 7일)*");
+    lines.push(`전체 게시: ${s.total}건`);
+    if (s.missed.length === 0) {
+      lines.push(`✅ 전원 주 ${s.requiredPerPerson}건 충족`);
+    } else {
+      const missedStr = s.missed
+        .map((m) => `${m.name}(${m.count}건)`)
+        .join(", ");
+      lines.push(`주 ${s.requiredPerPerson}건 미달: ${missedStr}`);
+    }
   }
   return lines.join("\n");
 }

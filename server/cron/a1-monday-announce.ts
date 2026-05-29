@@ -65,7 +65,7 @@ export async function runA1(now: Date = new Date()): Promise<void> {
   }
 
   try {
-    const r = await postMessage({ channel: e.SLACK_CHANNEL_ID, text });
+    const r = await postMessage({ channel: e.SLACK_AX_CHANNEL_ID, text });
     await recordAuditLog({
       jobName: JOB,
       channelId: r.channel,

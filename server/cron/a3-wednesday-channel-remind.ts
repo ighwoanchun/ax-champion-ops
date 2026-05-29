@@ -84,7 +84,7 @@ export async function runA3(now: Date = new Date()): Promise<void> {
   }
 
   // 2. 채널 멤버 ∩ active
-  const channelMembers = new Set(await listChannelMembers(e.SLACK_CHANNEL_ID));
+  const channelMembers = new Set(await listChannelMembers(e.SLACK_AX_CHANNEL_ID));
   const expected: string[] = [];
   for (const id of activeIds) {
     if (channelMembers.has(id)) expected.push(id);
@@ -92,7 +92,7 @@ export async function runA3(now: Date = new Date()): Promise<void> {
 
   // 3. 당일 메시지 → 제출자 식별
   const since = todayMidnightKstAsUnixTs(now);
-  const messages = await fetchChannelMessagesSince(e.SLACK_CHANNEL_ID, since);
+  const messages = await fetchChannelMessagesSince(e.SLACK_AX_CHANNEL_ID, since);
   const submitters = new Set<string>();
   for (const m of messages) {
     if (!m.user) continue;
@@ -109,7 +109,7 @@ export async function runA3(now: Date = new Date()): Promise<void> {
       : msgUnsubmittedReminder({ unsubmittedUserIds: unsubmitted });
 
   try {
-    const r = await postMessage({ channel: e.SLACK_CHANNEL_ID, text });
+    const r = await postMessage({ channel: e.SLACK_AX_CHANNEL_ID, text });
     await recordAuditLog({
       jobName: JOB,
       channelId: r.channel,

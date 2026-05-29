@@ -6,9 +6,7 @@ let api: sheets_v4.Sheets | undefined;
 export function sheets(): sheets_v4.Sheets {
   if (api) return api;
   const e = env();
-  const credsJson = JSON.parse(
-    Buffer.from(e.GOOGLE_SERVICE_ACCOUNT_KEY, "base64").toString("utf-8"),
-  );
+  const credsJson = JSON.parse(e.GOOGLE_SERVICE_ACCOUNT_KEY);
   const auth = new google.auth.JWT({
     email: e.GOOGLE_SERVICE_ACCOUNT_EMAIL,
     key: credsJson.private_key,
