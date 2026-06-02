@@ -18,6 +18,7 @@ import {
 } from "../../lib/db";
 import {
   fetchChannelMessagesSince,
+  findScrumAnnounceTs,
   listChannelMembers,
   notifyAdmin,
   postMessage,
@@ -113,8 +114,19 @@ export async function runA3(now: Date = new Date()): Promise<void> {
           unsubmittedUserIds: unsubmitted,
         });
 
+  // 운영진 또는 봇 A2가 올린 양식 공지 메시지를 찾아 thread reply 로 게시
+  const threadTs = await findScrumAnnounceTs({
+    channelId: e.SLACK_AX_CHANNEL_ID,
+    scrumDateYmd: today.scrumDate,
+    adminUserId: e.SLACK_ADMIN_USER_ID,
+  });
+
   try {
-    const r = await postMessage({ channel: e.SLACK_AX_CHANNEL_ID, text });
+    const r = await postMessage({
+      channel: e.SLACK_AX_CHANNEL_ID,
+      text,
+      threadTs,
+    });
     await recordAuditLog({
       jobName: JOB,
       channelId: r.channel,

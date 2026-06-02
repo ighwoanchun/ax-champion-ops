@@ -1,6 +1,6 @@
 {
   "version": "2.0",
-  "lastUpdated": "2026-06-02T10:00:21.485Z",
+  "lastUpdated": "2026-06-02T10:25:27.440Z",
   "activeFeatures": [
     "AX챔피언 운영",
     "health",
@@ -20,9 +20,9 @@
       "documents": {},
       "timestamps": {
         "started": "2026-05-07T06:27:53.113Z",
-        "lastUpdated": "2026-06-02T04:25:58.690Z"
+        "lastUpdated": "2026-06-02T10:25:18.124Z"
       },
-      "lastFile": "/Users/ighwoanchun/claude_test/AX챔피언 운영/lib/weekly-report.ts"
+      "lastFile": "/Users/ighwoanchun/claude_test/AX챔피언 운영/lib/slack.ts"
     },
     "health": {
       "phase": "do",
@@ -46,9 +46,9 @@
       "documents": {},
       "timestamps": {
         "started": "2026-05-07T06:28:35.605Z",
-        "lastUpdated": "2026-06-02T10:00:21.485Z"
+        "lastUpdated": "2026-06-02T10:25:27.440Z"
       },
-      "lastFile": "/Users/ighwoanchun/claude_test/AX챔피언 운영/server/cron/register.ts"
+      "lastFile": "/Users/ighwoanchun/claude_test/AX챔피언 운영/server/cron/a3-wednesday-channel-remind.ts"
     },
     "scripts": {
       "phase": "do",
@@ -98,7 +98,7 @@
   "session": {
     "startedAt": "2026-05-07T02:07:04.849Z",
     "onboardingCompleted": false,
-    "lastActivity": "2026-06-02T10:00:21.485Z"
+    "lastActivity": "2026-06-02T10:25:27.440Z"
   },
   "history": [
     {
@@ -577,6 +577,24 @@
     },
     {
       "timestamp": "2026-06-02T10:00:21.485Z",
+      "feature": "cron",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-06-02T10:25:18.124Z",
+      "feature": "AX챔피언 운영",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-06-02T10:25:24.738Z",
+      "feature": "cron",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-06-02T10:25:27.440Z",
       "feature": "cron",
       "phase": "do",
       "action": "updated"
