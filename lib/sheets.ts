@@ -32,6 +32,48 @@ export type ParticipantRow = {
 const SHEET_PARTICIPANTS = "participants";
 const SHEET_ATTENDANCE = "offline_attendance";
 const SHEET_REPORT = "weekly_report";
+const SHEET_WEEKLY_SCHEDULE = "weekly_schedule";
+
+export type ScheduleFormat = "kickoff" | "slack" | "offline" | "skip";
+
+export type WeeklyScheduleRow = {
+  weekNumber: number;
+  format: ScheduleFormat;
+  announceDate: string; // YYYY-MM-DD (KST). 빈 값이면 그 주차 A1 발화 안 함.
+  scrumDate: string;    // YYYY-MM-DD (KST). 빈 값이면 그 주차 A3/A4 발화 안 함.
+  notes: string;
+};
+
+/**
+ * weekly_schedule 탭 전체 조회.
+ * 헤더: weekNumber | format | announce_date | scrum_date | notes
+ * weekNumber가 숫자가 아닌 행(빈 행 등)은 자동 제외.
+ */
+export async function listWeeklySchedule(): Promise<WeeklyScheduleRow[]> {
+  const e = env();
+  const r = await sheets().spreadsheets.values.get({
+    spreadsheetId: e.GOOGLE_SHEETS_ID,
+    range: `${SHEET_WEEKLY_SCHEDULE}!A2:E`,
+  });
+  const rows = r.data.values ?? [];
+  return rows
+    .filter((row) => row[0] && /^\d+$/.test(String(row[0]).trim()))
+    .map((row) => {
+      const fmtRaw = String(row[1] ?? "").trim().toLowerCase();
+      const fmt: ScheduleFormat =
+        fmtRaw === "kickoff" || fmtRaw === "slack" ||
+        fmtRaw === "offline" || fmtRaw === "skip"
+          ? fmtRaw
+          : "skip";
+      return {
+        weekNumber: parseInt(String(row[0]).trim(), 10),
+        format: fmt,
+        announceDate: String(row[2] ?? "").trim(),
+        scrumDate: String(row[3] ?? "").trim(),
+        notes: String(row[4] ?? "").trim(),
+      };
+    });
+}
 
 /** participants 탭 전체 조회 (헤더 제외) */
 export async function listParticipants(): Promise<ParticipantRow[]> {

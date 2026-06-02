@@ -17,37 +17,56 @@
  *   - W2(짝) 슬랙, W3(홀) 오프라인, W4(짝) 슬랙, W5(홀) 오프라인 ... W9(홀) 오프라인. ✓
  */
 
-import { differenceInCalendarDays, parseISO, startOfDay } from "date-fns";
+import { format as formatDate, subDays } from "date-fns";
 import { toZonedTime } from "date-fns-tz";
+import type { ScheduleFormat, WeeklyScheduleRow } from "./sheets";
 
 const KST = "Asia/Seoul";
 
-export type WedFormat = "kickoff" | "offline" | "slack";
+export type WedFormat = ScheduleFormat;
 
-export interface WeekContext {
-  weekNumber: number; // 1..N
-  wedFormat: WedFormat;
-  isWithinProgram: boolean;
+/** KST 기준 YYYY-MM-DD 추출 */
+export function ymdKst(d: Date): string {
+  return formatDate(toZonedTime(d, KST), "yyyy-MM-dd");
 }
 
-export interface ScheduleConfig {
-  startDate: string; // YYYY-MM-DD, must be Monday of W1
-  totalWeeks: number; // default 9
+/**
+ * 오늘(KST) 발화 대상 announce 행 찾기.
+ * announce_date == 오늘 인 행 반환. 없으면 undefined.
+ */
+export function findAnnounceForToday(
+  now: Date,
+  schedule: WeeklyScheduleRow[],
+): WeeklyScheduleRow | undefined {
+  const today = ymdKst(now);
+  return schedule.find((s) => s.announceDate === today && s.format !== "skip");
 }
 
-/** 현재 KST 기준 일자에서 프로그램 컨텍스트 계산. */
-export function getWeekContext(now: Date, cfg: ScheduleConfig): WeekContext {
-  const nowKst = toZonedTime(now, KST);
-  const startKst = toZonedTime(parseISO(cfg.startDate), KST);
-  const days = differenceInCalendarDays(startOfDay(nowKst), startOfDay(startKst));
-  const weekNumber = Math.floor(days / 7) + 1;
-  const isWithinProgram = weekNumber >= 1 && weekNumber <= cfg.totalWeeks;
-  const wedFormat: WedFormat =
-    weekNumber === 1 ? "kickoff" : weekNumber % 2 === 0 ? "slack" : "offline";
-  return { weekNumber, wedFormat, isWithinProgram };
+/**
+ * 오늘(KST) scrum_date 인 행 찾기.
+ * scrum_date == 오늘 인 행 반환. 없으면 undefined.
+ */
+export function findScrumForToday(
+  now: Date,
+  schedule: WeeklyScheduleRow[],
+): WeeklyScheduleRow | undefined {
+  const today = ymdKst(now);
+  return schedule.find((s) => s.scrumDate === today && s.format !== "skip");
 }
 
-/** Cron 핸들러용 idempotency 키. ex: '2026-W19-A3' */
+/**
+ * 어제(KST)가 scrum_date 인 행 찾기. A4(익일 마감 요약) 용도.
+ */
+export function findFinalizationDay(
+  now: Date,
+  schedule: WeeklyScheduleRow[],
+): WeeklyScheduleRow | undefined {
+  const yesterdayKst = subDays(toZonedTime(now, KST), 1);
+  const yesterday = formatDate(yesterdayKst, "yyyy-MM-dd");
+  return schedule.find((s) => s.scrumDate === yesterday && s.format !== "skip");
+}
+
+/** Cron 핸들러용 idempotency 키. ex: 'W04-A3' */
 export function runSlot(jobName: string, weekNumber: number): string {
   return `W${weekNumber.toString().padStart(2, "0")}-${jobName}`;
 }

@@ -19,7 +19,7 @@ import { env } from "@/lib/env";
 
 export const dynamic = "force-dynamic";
 
-const VALID_JOBS = new Set(["A1", "A3", "A4"]);
+const VALID_JOBS = new Set(["A1", "A2", "A3", "A4"]);
 
 export async function POST(
   req: Request,
@@ -66,6 +66,9 @@ export async function POST(
     if (job === "A1") {
       const { runA1 } = await import("@/server/cron/a1-monday-announce");
       await runA1(asOf);
+    } else if (job === "A2") {
+      const { runA2 } = await import("@/server/cron/a2-scrum-day-morning");
+      await runA2(asOf);
     } else if (job === "A3") {
       const { runA3 } = await import("@/server/cron/a3-wednesday-channel-remind");
       await runA3(asOf);

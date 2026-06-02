@@ -29,13 +29,31 @@ const envSchema = z.object({
   ADMIN_API_TOKEN: z.string().min(16),
 
   TZ: z.string().default("Asia/Seoul"),
+  // PROGRAM_START_DATE / PROGRAM_WEEKS 는 2026-06-01 이후 weekly_schedule 시트 기반으로 전환되어
+  // 핸들러는 더 이상 참조하지 않는다. 호환·메타데이터 용도로만 유지.
   PROGRAM_START_DATE: z
     .string()
-    .regex(/^\d{4}-\d{2}-\d{2}$/, "YYYY-MM-DD"),
+    .regex(/^\d{4}-\d{2}-\d{2}$/, "YYYY-MM-DD")
+    .optional(),
   PROGRAM_WEEKS: z
     .string()
     .default("9")
-    .transform((v) => parseInt(v, 10)),
+    .transform((v) => parseInt(v, 10))
+    .optional(),
+
+  // ── Atlassian / Confluence (P1 주간 리포트 자동 생성) ──
+  // 모두 optional. 미주입 시 A4가 Confluence 생성 단계만 silent skip.
+  ATLASSIAN_API_TOKEN: z.string().optional(),
+  ATLASSIAN_EMAIL: z.string().email().optional(),
+  ATLASSIAN_CLOUD_ID: z.string().optional(), // 예: "wantedlab.atlassian.net" 또는 UUID
+  CONFLUENCE_PARENT_PAGE_ID: z.string().optional(),
+
+  // ── ennoia (LLM 분석) ──
+  // 인증: headers { project, apiKey }. agent 식별: body.hash. messages[].content[] = [{type:'text', text}].
+  ENNOIA_API_TOKEN: z.string().optional(),
+  ENNOIA_PROJECT_ID: z.string().optional(),
+  ENNOIA_AGENT_HASH: z.string().optional(),
+  ENNOIA_ENDPOINT_URL: z.string().url().optional(),
 });
 
 export type Env = z.infer<typeof envSchema>;

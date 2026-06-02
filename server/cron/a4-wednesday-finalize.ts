@@ -1,15 +1,15 @@
 /**
- * A4 — 수요일 18:00 슬랙 스크럼 마감 + 트래킹.
+ * A4 — 익일 10:00 슬랙 스크럼 마감 요약 (어제 = scrum_date 인 경우 발화).
  *
  * 동작:
- *  1) 슬랙 주차가 아니면 종료
- *  2) 당일 채널 메시지 스캔 → 제출자/미제출자 분류
+ *  1) weekly_schedule 시트에서 어제가 scrum_date + format=slack 인지 확인
+ *  2) 어제 채널 메시지 스캔 → 제출자/미제출자 분류
  *  3) Postgres `scrum_submissions` 에 전원 한 줄씩 기록
  *  4) Sheets `weekly_report` 탭에 한 줄 append
- *  5) 운영진 DM 으로 마감 요약 발송
+ *  5) 운영진 DM 으로 마감 요약 발송 (ai-줍줍 게시자 명단 포함)
  */
 
-import { format, startOfDay } from "date-fns";
+import { format, parseISO, startOfDay } from "date-fns";
 import { toZonedTime } from "date-fns-tz";
 import { env } from "../../lib/env";
 import {
@@ -24,37 +24,51 @@ import {
 } from "../../lib/slack";
 import {
   hasBlockerSection,
+  isJubjubProjectPost,
   isScrumSubmission,
   msgFinalizeAdminReport,
 } from "../../lib/messages";
-import { appendWeeklyReport, listParticipants } from "../../lib/sheets";
-import { getWeekContext, runSlot } from "../../lib/schedule";
+import {
+  appendWeeklyReport,
+  listParticipants,
+  listWeeklySchedule,
+} from "../../lib/sheets";
+import { findFinalizationDay, runSlot } from "../../lib/schedule";
+import {
+  buildSubmissionsForReport,
+  generateAndPublishWeeklyReport,
+} from "../../lib/weekly-report";
 
 const KST = "Asia/Seoul";
 const JOB = "A4";
 
-function todayMidnightKstAsUnixTs(now: Date): string {
-  const z = toZonedTime(now, KST);
-  const startKst = startOfDay(z);
-  const utcMs = startKst.getTime() - 9 * 60 * 60 * 1000;
+/** KST 기준 특정 일자(YYYY-MM-DD) 00:00 → Slack ts 초 단위 */
+function dayMidnightKstAsUnixTs(ymd: string): string {
+  // parseISO("2026-06-02") 는 local timezone 의 00:00 으로 해석됨.
+  // 컨테이너 TZ=Asia/Seoul 이므로 결과는 KST 00:00 = UTC -9.
+  const local = parseISO(ymd);
+  const utcMs = local.getTime() - 9 * 60 * 60 * 1000;
   return (utcMs / 1000).toFixed(6);
 }
 
 export async function runA4(now: Date = new Date()): Promise<void> {
   const e = env();
-  const ctx = getWeekContext(now, {
-    startDate: e.PROGRAM_START_DATE,
-    totalWeeks: e.PROGRAM_WEEKS,
-  });
+  const schedule = await listWeeklySchedule();
+  if (schedule.length === 0) {
+    console.log("[A4] weekly_schedule sheet is empty; skipping");
+    return;
+  }
 
-  if (!ctx.isWithinProgram || ctx.wedFormat !== "slack") {
+  // 어제(KST)가 scrum_date 인 행을 찾는다. 즉 오늘이 마감 익일 처리일.
+  const today = findFinalizationDay(now, schedule);
+  if (!today || today.format !== "slack") {
     console.log(
-      `[A4] not a slack-scrum week (week=${ctx.weekNumber}, format=${ctx.wedFormat}); skipping`,
+      `[A4] yesterday was not a slack scrum_date (matched=${today?.weekNumber ?? "none"}, format=${today?.format ?? "n/a"}); skipping`,
     );
     return;
   }
 
-  const slot = runSlot(JOB, ctx.weekNumber);
+  const slot = runSlot(JOB, today.weekNumber);
   const acquired = await tryAcquireCronLock(JOB, slot);
   if (!acquired) {
     console.log(`[A4] already fired for ${slot}; skipping`);
@@ -73,7 +87,8 @@ export async function runA4(now: Date = new Date()): Promise<void> {
   );
   const expected = active.filter((p) => channelMembers.has(p.slackUserId));
 
-  const since = todayMidnightKstAsUnixTs(now);
+  // 스크럼 메시지는 scrum_date 당일 채널에 올라옴. 그 자정 ts 기준으로 24시간치 조회.
+  const since = dayMidnightKstAsUnixTs(today.scrumDate);
   const messages = await fetchChannelMessagesSince(
     e.SLACK_AX_CHANNEL_ID,
     since,
@@ -91,13 +106,16 @@ export async function runA4(now: Date = new Date()): Promise<void> {
     }
   }
 
-  const scrumDate = format(toZonedTime(now, KST), "yyyy-MM-dd");
+  // scrum_date 는 시트 기준(어제). reportDate 등에도 동일하게 사용.
+  const scrumDate = today.scrumDate;
+  // for unused import noise 회피
+  void format; void toZonedTime; void startOfDay;
 
   // Postgres 기록 (전원)
   for (const p of expected) {
     const sub = submitterMsg.get(p.slackUserId);
     await recordScrumSubmission({
-      weekNumber: ctx.weekNumber,
+      weekNumber: today.weekNumber,
       scrumDate,
       slackUserId: p.slackUserId,
       submitted: !!sub,
@@ -117,7 +135,7 @@ export async function runA4(now: Date = new Date()): Promise<void> {
 
   // Sheets weekly_report 추가
   await appendWeeklyReport({
-    weekNumber: ctx.weekNumber,
+    weekNumber: today.weekNumber,
     reportDate: scrumDate,
     totalActive: active.length,
     scrumSubmitted: submittedCount,
@@ -126,13 +144,10 @@ export async function runA4(now: Date = new Date()): Promise<void> {
     dropoutSignalCount: 0,
   });
 
-  // ai-줍줍 게시 카운트 트래킹 (지난 7일).
-  // SLACK_AI_JUBJUB_CHANNEL_ID가 주입된 경우에만 실행. 실패해도 A4 전체를 막지 않음.
-  const AI_JUBJUB_REQUIRED = 2;
+  // ai-줍줍 게시 카운트 트래킹 (지난 7일, 게시자 명단 표시).
   let aiJubjubStats: {
     total: number;
-    requiredPerPerson: number;
-    missed: { name: string; count: number }[];
+    posters: { name: string; count: number }[];
   } | undefined;
   if (e.SLACK_AI_JUBJUB_CHANNEL_ID && active.length > 0) {
     try {
@@ -148,36 +163,49 @@ export async function runA4(now: Date = new Date()): Promise<void> {
       for (const p of active) counts.set(p.slackUserId, 0);
       for (const m of jubjubMessages) {
         if (!m.user) continue;
+        if (!isJubjubProjectPost(m.text)) continue;
         if (counts.has(m.user)) {
           counts.set(m.user, (counts.get(m.user) ?? 0) + 1);
         }
       }
       const totalPosts = Array.from(counts.values()).reduce((a, b) => a + b, 0);
-      const missed = active
-        .filter((p) => (counts.get(p.slackUserId) ?? 0) < AI_JUBJUB_REQUIRED)
+      const posters = active
+        .filter((p) => (counts.get(p.slackUserId) ?? 0) > 0)
         .map((p) => ({
           name: p.name,
           count: counts.get(p.slackUserId) ?? 0,
         }));
-      aiJubjubStats = {
-        total: totalPosts,
-        requiredPerPerson: AI_JUBJUB_REQUIRED,
-        missed,
-      };
+      aiJubjubStats = { total: totalPosts, posters };
     } catch (err) {
       console.error("[A4] ai-jubjub fetch failed (continuing):", err);
     }
   }
 
+  // Confluence 주간 리포트 자동 생성 (ennoia 분석 + Atlassian API).
+  // 환경변수 미주입·실패 시 silent skip — A4 본체는 정상 마감.
+  let confluenceUrl: string | undefined;
+  try {
+    const submissions = buildSubmissionsForReport(active, submitterMsg);
+    const report = await generateAndPublishWeeklyReport({
+      weekNumber: today.weekNumber,
+      scrumDate: today.scrumDate,
+      participants: submissions,
+    });
+    confluenceUrl = report?.url;
+  } catch (err) {
+    console.error("[A4] weekly-report generation failed (continuing):", err);
+  }
+
   // 운영진 DM
   await notifyAdmin(
     msgFinalizeAdminReport({
-      weekNumber: ctx.weekNumber,
+      weekNumber: today.weekNumber,
       scrumDate: now,
       submittedCount,
       totalCount,
       unsubmittedNames,
       aiJubjubStats,
+      confluenceUrl,
     }),
   );
 
@@ -185,7 +213,7 @@ export async function runA4(now: Date = new Date()): Promise<void> {
     jobName: JOB,
     status: "success",
     payload: {
-      weekNumber: ctx.weekNumber,
+      weekNumber: today.weekNumber,
       total: totalCount,
       submitted: submittedCount,
       missed: missedCount,
@@ -193,14 +221,15 @@ export async function runA4(now: Date = new Date()): Promise<void> {
       aiJubjub: aiJubjubStats
         ? {
             total: aiJubjubStats.total,
-            missedCount: aiJubjubStats.missed.length,
+            posterCount: aiJubjubStats.posters.length,
           }
         : null,
+      confluenceUrl: confluenceUrl ?? null,
     },
   });
 
   console.log(
-    `[A4] finalized week=${ctx.weekNumber} submitted=${submittedCount}/${totalCount}`,
+    `[A4] finalized week=${today.weekNumber} submitted=${submittedCount}/${totalCount}`,
   );
 }
 
