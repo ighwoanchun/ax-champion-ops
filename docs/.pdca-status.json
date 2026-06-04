@@ -1,13 +1,15 @@
 {
   "version": "2.0",
-  "lastUpdated": "2026-06-02T10:25:27.440Z",
+  "lastUpdated": "2026-06-04T09:33:34.141Z",
   "activeFeatures": [
     "AX챔피언 운영",
     "health",
     "cron",
     "scripts",
     "[job]",
-    "dummy-report"
+    "dummy-report",
+    "post-page",
+    "share-report"
   ],
   "primaryFeature": "AX챔피언 운영",
   "features": {
@@ -20,9 +22,9 @@
       "documents": {},
       "timestamps": {
         "started": "2026-05-07T06:27:53.113Z",
-        "lastUpdated": "2026-06-02T10:25:18.124Z"
+        "lastUpdated": "2026-06-04T09:24:48.015Z"
       },
-      "lastFile": "/Users/ighwoanchun/claude_test/AX챔피언 운영/lib/slack.ts"
+      "lastFile": "/Users/ighwoanchun/claude_test/AX챔피언 운영/lib/messages.ts"
     },
     "health": {
       "phase": "do",
@@ -88,6 +90,32 @@
         "lastUpdated": "2026-06-02T04:47:53.068Z"
       },
       "lastFile": "/Users/ighwoanchun/claude_test/AX챔피언 운영/app/api/admin/dummy-report/route.ts"
+    },
+    "post-page": {
+      "phase": "do",
+      "phaseNumber": 3,
+      "matchRate": null,
+      "iterationCount": 0,
+      "requirements": [],
+      "documents": {},
+      "timestamps": {
+        "started": "2026-06-04T02:15:45.436Z",
+        "lastUpdated": "2026-06-04T02:15:45.436Z"
+      },
+      "lastFile": "/Users/ighwoanchun/claude_test/AX챔피언 운영/app/api/admin/post-page/route.ts"
+    },
+    "share-report": {
+      "phase": "do",
+      "phaseNumber": 3,
+      "matchRate": null,
+      "iterationCount": 0,
+      "requirements": [],
+      "documents": {},
+      "timestamps": {
+        "started": "2026-06-04T08:21:39.134Z",
+        "lastUpdated": "2026-06-04T09:33:34.141Z"
+      },
+      "lastFile": "/Users/ighwoanchun/claude_test/AX챔피언 운영/app/api/admin/share-report/route.ts"
     }
   },
   "pipeline": {
@@ -98,7 +126,7 @@
   "session": {
     "startedAt": "2026-05-07T02:07:04.849Z",
     "onboardingCompleted": false,
-    "lastActivity": "2026-06-02T10:25:27.440Z"
+    "lastActivity": "2026-06-04T09:33:34.141Z"
   },
   "history": [
     {
@@ -596,6 +624,48 @@
     {
       "timestamp": "2026-06-02T10:25:27.440Z",
       "feature": "cron",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-06-04T02:15:45.436Z",
+      "feature": "post-page",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-06-04T08:21:39.134Z",
+      "feature": "share-report",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-06-04T09:21:02.232Z",
+      "feature": "share-report",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-06-04T09:24:31.994Z",
+      "feature": "share-report",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-06-04T09:24:48.015Z",
+      "feature": "AX챔피언 운영",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-06-04T09:29:31.287Z",
+      "feature": "share-report",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-06-04T09:33:34.141Z",
+      "feature": "share-report",
       "phase": "do",
       "action": "updated"
     }

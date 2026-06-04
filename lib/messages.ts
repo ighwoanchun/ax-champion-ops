@@ -129,6 +129,24 @@ export function msgFinalizeAdminReport(input: {
 }
 
 /**
+ * 운영진 수동 트리거 — 주간 리포트 채널 공유 메시지.
+ * A4 자동 발화 후 운영진이 Confluence 페이지 검토를 마치고 명령으로 발송.
+ */
+export function msgShareWeeklyReport(input: {
+  weekNumber: number;
+  scrumDate: Date;
+  confluenceUrl: string;
+}): string {
+  return [
+    `📄 W${input.weekNumber} 주간 리포트가 올라왔습니다 (${fmtKstDate(input.scrumDate)} 스크럼 기준).`,
+    "",
+    `<${input.confluenceUrl}|Confluence 페이지 열기>`,
+    "",
+    "지난 한 주의 진척과 도움 요청을 정리해두었습니다. 시간 되실 때 한번 확인 부탁드립니다 🙏",
+  ].join("\n");
+}
+
+/**
  * 스크럼 제출 메시지 식별.
  * 새 양식: '* 위클리스크럼 - [이름]' (이모지·별표 유무 무관).
  * 본문 첫 100자 내에 '위클리스크럼' 또는 '위클리 스크럼' 이 포함되면 제출로 간주.
