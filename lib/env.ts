@@ -47,13 +47,21 @@ const envSchema = z.object({
   ATLASSIAN_EMAIL: z.string().email().optional(),
   ATLASSIAN_CLOUD_ID: z.string().optional(), // 예: "wantedlab.atlassian.net" 또는 UUID
   CONFLUENCE_PARENT_PAGE_ID: z.string().optional(),
+  // 이전 주차 리포트 페이지 ID (콤마 구분, 시간 순). 예: "4812505595" (W2)
+  // ennoia 호출 시 이전 리포트 본문을 fetch → input.previousReports 로 전달.
+  CONFLUENCE_PREVIOUS_REPORT_IDS: z.string().optional(),
 
-  // ── ennoia (LLM 분석) ──
-  // 인증: headers { project, apiKey }. agent 식별: body.hash. messages[].content[] = [{type:'text', text}].
+  // ── ennoia (legacy — 2026-06-05 부로 Gemini 로 대체. 환경변수만 유지) ──
   ENNOIA_API_TOKEN: z.string().optional(),
   ENNOIA_PROJECT_ID: z.string().optional(),
   ENNOIA_AGENT_HASH: z.string().optional(),
   ENNOIA_ENDPOINT_URL: z.string().url().optional(),
+
+  // ── Gemini (LLM 분석 — 주력) ──
+  // 발급: https://aistudio.google.com/apikey
+  // 모델 기본값: gemini-2.5-pro (긴 출력 안정, 한국어 우수, 1M context).
+  GEMINI_API_KEY: z.string().optional(),
+  GEMINI_MODEL: z.string().default("gemini-2.5-pro").optional(),
 });
 
 export type Env = z.infer<typeof envSchema>;

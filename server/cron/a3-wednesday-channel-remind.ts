@@ -18,6 +18,7 @@ import {
 } from "../../lib/db";
 import {
   fetchChannelMessagesSince,
+  fetchThreadReplies,
   findScrumAnnounceTs,
   listChannelMembers,
   notifyAdmin,
@@ -93,11 +94,27 @@ export async function runA3(now: Date = new Date()): Promise<void> {
     if (channelMembers.has(id)) expected.push(id);
   }
 
-  // 3. 당일 메시지 → 제출자 식별
+  // 3. 양식 공지 thread 탐지 + top-level 메시지 + thread reply 모두 합쳐서 제출자 식별
+  //    (참가자들이 thread 안에 댓글로 양식 작성하는 패턴이라 thread reply 필수)
+  const threadTs = await findScrumAnnounceTs({
+    channelId: e.SLACK_AX_CHANNEL_ID,
+    scrumDateYmd: today.scrumDate,
+    adminUserId: e.SLACK_ADMIN_USER_ID,
+    lookbackHours: 168,
+  });
   const since = todayMidnightKstAsUnixTs(now);
-  const messages = await fetchChannelMessagesSince(e.SLACK_AX_CHANNEL_ID, since);
+  const topMessages = await fetchChannelMessagesSince(e.SLACK_AX_CHANNEL_ID, since);
+  const threadMessages = threadTs
+    ? await fetchThreadReplies(e.SLACK_AX_CHANNEL_ID, threadTs)
+    : [];
+  const seen = new Set<string>();
+  const allMessages = [...topMessages, ...threadMessages].filter((m) => {
+    if (seen.has(m.ts)) return false;
+    seen.add(m.ts);
+    return true;
+  });
   const submitters = new Set<string>();
-  for (const m of messages) {
+  for (const m of allMessages) {
     if (!m.user) continue;
     if (isScrumSubmission(m.text)) submitters.add(m.user);
   }
@@ -113,13 +130,6 @@ export async function runA3(now: Date = new Date()): Promise<void> {
           submittedCount: submitters.size,
           unsubmittedUserIds: unsubmitted,
         });
-
-  // 운영진 또는 봇 A2가 올린 양식 공지 메시지를 찾아 thread reply 로 게시
-  const threadTs = await findScrumAnnounceTs({
-    channelId: e.SLACK_AX_CHANNEL_ID,
-    scrumDateYmd: today.scrumDate,
-    adminUserId: e.SLACK_ADMIN_USER_ID,
-  });
 
   try {
     const r = await postMessage({

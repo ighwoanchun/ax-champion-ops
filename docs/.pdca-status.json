@@ -1,6 +1,6 @@
 {
   "version": "2.0",
-  "lastUpdated": "2026-06-04T09:33:34.141Z",
+  "lastUpdated": "2026-06-05T02:52:10.929Z",
   "activeFeatures": [
     "AX챔피언 운영",
     "health",
@@ -22,9 +22,9 @@
       "documents": {},
       "timestamps": {
         "started": "2026-05-07T06:27:53.113Z",
-        "lastUpdated": "2026-06-04T09:24:48.015Z"
+        "lastUpdated": "2026-06-05T02:52:10.929Z"
       },
-      "lastFile": "/Users/ighwoanchun/claude_test/AX챔피언 운영/lib/messages.ts"
+      "lastFile": "/Users/ighwoanchun/claude_test/AX챔피언 운영/lib/weekly-report.ts"
     },
     "health": {
       "phase": "do",
@@ -48,9 +48,9 @@
       "documents": {},
       "timestamps": {
         "started": "2026-05-07T06:28:35.605Z",
-        "lastUpdated": "2026-06-02T10:25:27.440Z"
+        "lastUpdated": "2026-06-04T23:31:34.073Z"
       },
-      "lastFile": "/Users/ighwoanchun/claude_test/AX챔피언 운영/server/cron/a3-wednesday-channel-remind.ts"
+      "lastFile": "/Users/ighwoanchun/claude_test/AX챔피언 운영/server/cron/a4-wednesday-finalize.ts"
     },
     "scripts": {
       "phase": "do",
@@ -126,7 +126,7 @@
   "session": {
     "startedAt": "2026-05-07T02:07:04.849Z",
     "onboardingCompleted": false,
-    "lastActivity": "2026-06-04T09:33:34.141Z"
+    "lastActivity": "2026-06-05T02:52:10.929Z"
   },
   "history": [
     {
@@ -666,6 +666,114 @@
     {
       "timestamp": "2026-06-04T09:33:34.141Z",
       "feature": "share-report",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-06-04T23:31:09.628Z",
+      "feature": "AX챔피언 운영",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-06-04T23:31:13.625Z",
+      "feature": "cron",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-06-04T23:31:24.999Z",
+      "feature": "cron",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-06-04T23:31:28.767Z",
+      "feature": "cron",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-06-04T23:31:34.073Z",
+      "feature": "cron",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-06-04T23:55:18.217Z",
+      "feature": "AX챔피언 운영",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-06-05T00:12:10.963Z",
+      "feature": "AX챔피언 운영",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-06-05T00:12:19.872Z",
+      "feature": "AX챔피언 운영",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-06-05T00:12:22.268Z",
+      "feature": "AX챔피언 운영",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-06-05T00:13:32.246Z",
+      "feature": "AX챔피언 운영",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-06-05T00:13:33.033Z",
+      "feature": "AX챔피언 운영",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-06-05T01:12:16.132Z",
+      "feature": "AX챔피언 운영",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-06-05T02:25:31.468Z",
+      "feature": "AX챔피언 운영",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-06-05T02:25:43.725Z",
+      "feature": "AX챔피언 운영",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-06-05T02:26:13.407Z",
+      "feature": "AX챔피언 운영",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-06-05T02:26:18.950Z",
+      "feature": "AX챔피언 운영",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-06-05T02:45:36.025Z",
+      "feature": "AX챔피언 운영",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-06-05T02:52:10.929Z",
+      "feature": "AX챔피언 운영",
       "phase": "do",
       "action": "updated"
     }

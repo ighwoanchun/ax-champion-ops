@@ -81,6 +81,32 @@ export async function getPageInfo(pageId: string): Promise<{
   return data;
 }
 
+/** 페이지 본문 조회 (storage representation). 이전 주차 리포트 참고용 */
+export async function getPageBody(pageId: string): Promise<{
+  id: string;
+  title: string;
+  body: string;
+}> {
+  const url = `${baseUrl()}/pages/${pageId}?body-format=storage`;
+  const res = await fetch(url, {
+    headers: { Authorization: authHeader(), Accept: "application/json" },
+  });
+  if (!res.ok) {
+    const t = await res.text();
+    throw new Error(`[confluence] getPageBody failed ${res.status}: ${t.slice(0, 300)}`);
+  }
+  const data = (await res.json()) as {
+    id: string;
+    title: string;
+    body?: { storage?: { value?: string } };
+  };
+  return {
+    id: data.id,
+    title: data.title,
+    body: data.body?.storage?.value ?? "",
+  };
+}
+
 /** Confluence v2 페이지 생성. spaceId 미입력 시 parentId 로부터 자동 조회. */
 export async function createConfluencePage(input: CreatePageInput): Promise<CreatePageResult> {
   const url = `${baseUrl()}/pages`;

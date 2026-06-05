@@ -109,6 +109,33 @@ export async function listChannelMembers(channelId: string): Promise<string[]> {
   return members;
 }
 
+/**
+ * 특정 thread 의 모든 reply(+ parent) 가져오기.
+ * 참가자들이 양식 공지 thread 안에 댓글로 스크럼 작성하는 패턴에 필수.
+ */
+export async function fetchThreadReplies(
+  channelId: string,
+  threadTs: string,
+): Promise<{ ts: string; user?: string; text?: string }[]> {
+  const all: { ts: string; user?: string; text?: string }[] = [];
+  let cursor: string | undefined;
+  for (let i = 0; i < 5; i++) {
+    const r = await slack().conversations.replies({
+      channel: channelId,
+      ts: threadTs,
+      limit: 200,
+      cursor,
+    });
+    for (const m of r.messages ?? []) {
+      if (!m.ts) continue;
+      all.push({ ts: m.ts, user: m.user, text: m.text });
+    }
+    cursor = r.response_metadata?.next_cursor || undefined;
+    if (!cursor) break;
+  }
+  return all;
+}
+
 /** 채널의 특정 시점 이후 메시지를 페이징 없이 가져옴 (최대 1000건). */
 export async function fetchChannelMessagesSince(
   channelId: string,

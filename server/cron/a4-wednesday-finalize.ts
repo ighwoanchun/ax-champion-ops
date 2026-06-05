@@ -19,6 +19,8 @@ import {
 } from "../../lib/db";
 import {
   fetchChannelMessagesSince,
+  fetchThreadReplies,
+  findScrumAnnounceTs,
   listChannelMembers,
   notifyAdmin,
 } from "../../lib/slack";
@@ -87,12 +89,28 @@ export async function runA4(now: Date = new Date()): Promise<void> {
   );
   const expected = active.filter((p) => channelMembers.has(p.slackUserId));
 
-  // 스크럼 메시지는 scrum_date 당일 채널에 올라옴. 그 자정 ts 기준으로 24시간치 조회.
+  // 스크럼 메시지는 scrum_date 당일 채널 top-level + 양식 공지 thread reply 모두 확인.
+  // (참가자들이 thread 안에 댓글로 작성하는 패턴 — A3와 동일 처리)
+  const threadTs = await findScrumAnnounceTs({
+    channelId: e.SLACK_AX_CHANNEL_ID,
+    scrumDateYmd: today.scrumDate,
+    adminUserId: e.SLACK_ADMIN_USER_ID,
+    lookbackHours: 168,
+  });
   const since = dayMidnightKstAsUnixTs(today.scrumDate);
-  const messages = await fetchChannelMessagesSince(
+  const topMessages = await fetchChannelMessagesSince(
     e.SLACK_AX_CHANNEL_ID,
     since,
   );
+  const threadMessages = threadTs
+    ? await fetchThreadReplies(e.SLACK_AX_CHANNEL_ID, threadTs)
+    : [];
+  const seenTs = new Set<string>();
+  const messages = [...topMessages, ...threadMessages].filter((m) => {
+    if (seenTs.has(m.ts)) return false;
+    seenTs.add(m.ts);
+    return true;
+  });
 
   // 사용자별 첫 스크럼 메시지만 채택
   type ScrumMsg = { ts: string; text: string };

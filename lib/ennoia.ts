@@ -55,7 +55,7 @@ export async function runEnnoiaAgent(
     ],
   };
 
-  const timeoutMs = input.timeoutMs ?? 90_000;
+  const timeoutMs = input.timeoutMs ?? 240_000;
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), timeoutMs);
 
