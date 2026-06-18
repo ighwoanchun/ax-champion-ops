@@ -48,10 +48,10 @@ export async function registerCronJobs(): Promise<void> {
     { timezone: TZ },
   );
 
-  // A2 — 매일 10:00 KST 발화 (A1·A4와 같은 시각, 다른 함수).
+  // A2 — 매일 11:00 KST 발화.
   // scrum_date == 오늘 + format=slack 인 경우 양식 안내 메시지를 채널에 게시.
   cron.schedule(
-    "0 10 * * *",
+    "0 11 * * *",
     () => {
       runA2().catch((err) => console.error("[cron][A2] error:", err));
     },
@@ -78,6 +78,6 @@ export async function registerCronJobs(): Promise<void> {
   );
 
   console.log(
-    "[cron] registration complete: A1@10 (announce), A2@10 (scrum-day form), A3@15 (mid-status), A4@10 (next-day finalize)",
+    "[cron] registration complete: A1@10 (announce), A2@11 (scrum-day form), A3@15 (mid-status), A4@10 (next-day finalize)",
   );
 }

@@ -1,5 +1,5 @@
 /**
- * A2 — 스크럼 당일 09시 양식 안내.
+ * A2 — 스크럼 당일 11시 양식 안내.
  *
  * 동작:
  *  1) weekly_schedule 시트에서 오늘이 scrum_date + format=slack 인지 확인

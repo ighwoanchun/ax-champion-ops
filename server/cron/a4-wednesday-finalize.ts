@@ -117,6 +117,8 @@ export async function runA4(now: Date = new Date()): Promise<void> {
   const submitterMsg = new Map<string, ScrumMsg>();
   for (const m of messages) {
     if (!m.user || !activeIds.has(m.user)) continue;
+    // 양식 공지(parent) 본문에도 '위클리 스크럼' 문구가 있어 제출로 오인될 수 있어 제외.
+    if (m.ts === threadTs) continue;
     if (!isScrumSubmission(m.text)) continue;
     const cur = submitterMsg.get(m.user);
     if (!cur || parseFloat(m.ts) < parseFloat(cur.ts)) {

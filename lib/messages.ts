@@ -37,15 +37,16 @@ export function msgOfflineAnnouncement(_input: {
  */
 export function msgScrumDayForm(): string {
   return [
-    "📌 오늘은 위클리 스크럼이 있는 날입니다.",
+    "<!channel>",
+    "오늘은 위클리 스크럼이 있는 날입니다.",
     "",
-    "한 주간 진행되었던 내용을 다음 양식에 기입하여 본 쓰레드에 공유 부탁드립니다.",
-    "많은 진전이 아니더라도 공유해주시면 됩니다.",
+    "지난 2주간 진행한 내용을 아래 양식에 맞춰 이 스레드에 댓글로 남겨주세요.",
+    "크게 진전이 없어도 괜찮으니 편하게 적어주시면 됩니다.",
     "",
     "* 위클리스크럼 - [이름]",
-    "* 지난 2주간 한것:",
-    "* 다음 2주간 할것:",
-    "* 막힌것/도움필요:",
+    "* 지난 2주간 한 것:",
+    "* 다음 2주간 할 것:",
+    "* 막힌 것 / 도움 필요:",
   ].join("\n");
 }
 
@@ -58,17 +59,17 @@ export function msgScrumMidStatus(input: {
   unsubmittedUserIds: string[];
 }): string {
   const lines = [
-    "📊 오늘 위클리 스크럼 중간 현황",
+    "오늘 위클리 스크럼 중간 현황입니다.",
     "",
-    `✅ ${input.submittedCount}명 제출 완료! 감사합니다 🙏`,
+    `현재 ${input.submittedCount}명 공유해주셨습니다.`,
   ];
   if (input.unsubmittedUserIds.length > 0) {
     const mentions = input.unsubmittedUserIds.map((u) => `<@${u}>`).join(" ");
     lines.push(
       "",
       `아직 작성 중이신 분 — ${mentions}`,
-      "오늘 18시까지 본 쓰레드에 한 주간 진행 내용 공유 부탁드립니다.",
-      "짧아도 괜찮고, 막힌 부분만 적어주셔도 충분합니다.",
+      "오늘 18시까지 이 스레드에 지난 2주간 진행 내용 공유 부탁드립니다.",
+      "짧아도 괜찮고, 막힌 부분만 적어주셔도 됩니다.",
     );
   }
   return lines.join("\n");
@@ -76,7 +77,7 @@ export function msgScrumMidStatus(input: {
 
 /** A3 — 전원 제출 완료 시 게시 */
 export function msgAllSubmitted(): string {
-  return "🎉 이번 주 위클리 스크럼 전원 제출 완료! 다들 수고하셨어요.";
+  return "이번 주 위클리 스크럼 전원 공유 완료했습니다. 다들 수고하셨습니다.";
 }
 
 /**
@@ -97,17 +98,17 @@ export function msgFinalizeAdminReport(input: {
   confluenceUrl?: string;
 }): string {
   const lines = [
-    `📊 *W${input.weekNumber} 슬랙 스크럼 마감 요약 (${fmtKstDate(input.scrumDate)} 기준)*`,
+    `*W${input.weekNumber} 슬랙 스크럼 마감 요약 (${fmtKstDate(input.scrumDate)} 기준)*`,
     `제출: ${input.submittedCount} / ${input.totalCount}`,
   ];
   if (input.unsubmittedNames.length > 0) {
     lines.push(`미제출자: ${input.unsubmittedNames.join(", ")}`);
   } else {
-    lines.push("✅ 전원 제출 완료");
+    lines.push("전원 제출 완료");
   }
   if (input.aiJubjubStats) {
     const s = input.aiJubjubStats;
-    lines.push("", "📤 *ai-줍줍 게시 현황 (지난 7일)*", `전체 게시: ${s.total}건`);
+    lines.push("", "*ai-줍줍 게시 현황 (지난 7일)*", `전체 게시: ${s.total}건`);
     if (s.posters.length === 0) {
       lines.push("아직 게시자가 없습니다.");
     } else {
@@ -123,7 +124,7 @@ export function msgFinalizeAdminReport(input: {
     }
   }
   if (input.confluenceUrl) {
-    lines.push("", `📄 *주간 리포트 자동 생성*`, `<${input.confluenceUrl}|Confluence 페이지 열기>`);
+    lines.push("", `*주간 리포트 자동 생성*`, `<${input.confluenceUrl}|Confluence 페이지 열기>`);
   }
   return lines.join("\n");
 }
@@ -138,11 +139,11 @@ export function msgShareWeeklyReport(input: {
   confluenceUrl: string;
 }): string {
   return [
-    `📄 W${input.weekNumber} 주간 리포트가 올라왔습니다 (${fmtKstDate(input.scrumDate)} 스크럼 기준).`,
+    `W${input.weekNumber} 주간 리포트가 올라왔습니다 (${fmtKstDate(input.scrumDate)} 스크럼 기준).`,
     "",
     `<${input.confluenceUrl}|Confluence 페이지 열기>`,
     "",
-    "지난 한 주의 진척과 도움 요청을 정리해두었습니다. 시간 되실 때 한번 확인 부탁드립니다 🙏",
+    "지난 2주간 진척과 도움 요청을 정리했습니다. 시간 되실 때 한번 확인 부탁드립니다.",
   ].join("\n");
 }
 

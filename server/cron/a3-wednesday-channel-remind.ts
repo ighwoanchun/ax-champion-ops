@@ -113,9 +113,16 @@ export async function runA3(now: Date = new Date()): Promise<void> {
     seen.add(m.ts);
     return true;
   });
+  // 제출자 식별. 주의:
+  //  - thread parent(양식 공지) 본문에도 '위클리 스크럼' 문구가 있어 isScrumSubmission 이
+  //    true 가 되므로, parent 메시지(ts === threadTs)는 반드시 제외.
+  //  - active 참가자(expected) 가 작성한 것만 제출로 인정. 봇/운영진 공지가 카운트되는 것을 차단.
+  const expectedSet = new Set(expected);
   const submitters = new Set<string>();
   for (const m of allMessages) {
     if (!m.user) continue;
+    if (m.ts === threadTs) continue;
+    if (!expectedSet.has(m.user)) continue;
     if (isScrumSubmission(m.text)) submitters.add(m.user);
   }
 
