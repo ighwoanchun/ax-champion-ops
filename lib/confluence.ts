@@ -156,6 +156,60 @@ export async function createConfluencePage(input: CreatePageInput): Promise<Crea
   };
 }
 
+/** 기존 페이지 본문을 새 storage 본문으로 덮어씀 (버전 자동 증가). 잘못 생성된 리포트 정정용. */
+export async function updateConfluencePage(input: {
+  pageId: string;
+  title: string;
+  body: string;
+  representation?: ConfluenceRepresentation;
+}): Promise<CreatePageResult> {
+  const infoRes = await fetch(`${baseUrl()}/pages/${input.pageId}`, {
+    headers: { Authorization: authHeader(), Accept: "application/json" },
+  });
+  if (!infoRes.ok) {
+    const t = await infoRes.text();
+    throw new Error(`[confluence] updatePage getInfo failed ${infoRes.status}: ${t.slice(0, 300)}`);
+  }
+  const info = (await infoRes.json()) as { version?: { number?: number } };
+  const nextVersion = (info.version?.number ?? 0) + 1;
+
+  const payload = {
+    id: input.pageId,
+    status: "current",
+    title: input.title,
+    body: {
+      representation: input.representation ?? "storage",
+      value: input.body,
+    },
+    version: { number: nextVersion },
+  };
+
+  const res = await fetch(`${baseUrl()}/pages/${input.pageId}`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: authHeader(),
+      Accept: "application/json",
+    },
+    body: JSON.stringify(payload),
+  });
+  if (!res.ok) {
+    const errText = await res.text();
+    throw new Error(`[confluence] updatePage failed ${res.status}: ${errText.slice(0, 500)}`);
+  }
+  const data = (await res.json()) as {
+    id: string;
+    title: string;
+    _links?: { webui?: string };
+  };
+  return {
+    id: data.id,
+    title: data.title,
+    webui: data._links?.webui ?? "",
+    status: res.status,
+  };
+}
+
 /** 페이지 절대 URL 조립 */
 export function absoluteWebUrl(webui: string): string {
   const e = env();

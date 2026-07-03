@@ -1,6 +1,6 @@
 {
   "version": "2.0",
-  "lastUpdated": "2026-06-18T02:22:30.643Z",
+  "lastUpdated": "2026-07-03T03:56:12.342Z",
   "activeFeatures": [
     "AX챔피언 운영",
     "health",
@@ -9,7 +9,8 @@
     "[job]",
     "dummy-report",
     "post-page",
-    "share-report"
+    "share-report",
+    "regenerate-report"
   ],
   "primaryFeature": "AX챔피언 운영",
   "features": {
@@ -22,7 +23,7 @@
       "documents": {},
       "timestamps": {
         "started": "2026-05-07T06:27:53.113Z",
-        "lastUpdated": "2026-06-18T02:22:30.643Z"
+        "lastUpdated": "2026-07-03T03:55:52.048Z"
       },
       "lastFile": "/Users/ighwoanchun/claude_test/AX챔피언 운영/lib/weekly-report.ts"
     },
@@ -116,6 +117,19 @@
         "lastUpdated": "2026-06-04T09:33:34.141Z"
       },
       "lastFile": "/Users/ighwoanchun/claude_test/AX챔피언 운영/app/api/admin/share-report/route.ts"
+    },
+    "regenerate-report": {
+      "phase": "do",
+      "phaseNumber": 3,
+      "matchRate": null,
+      "iterationCount": 0,
+      "requirements": [],
+      "documents": {},
+      "timestamps": {
+        "started": "2026-07-03T03:56:12.342Z",
+        "lastUpdated": "2026-07-03T03:56:12.342Z"
+      },
+      "lastFile": "/Users/ighwoanchun/claude_test/AX챔피언 운영/app/api/admin/regenerate-report/route.ts"
     }
   },
   "pipeline": {
@@ -126,7 +140,7 @@
   "session": {
     "startedAt": "2026-05-07T02:07:04.849Z",
     "onboardingCompleted": false,
-    "lastActivity": "2026-06-18T02:22:30.643Z"
+    "lastActivity": "2026-07-03T03:56:12.342Z"
   },
   "history": [
     {
@@ -870,6 +884,42 @@
     {
       "timestamp": "2026-06-18T02:22:30.643Z",
       "feature": "AX챔피언 운영",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-07-03T03:54:51.697Z",
+      "feature": "AX챔피언 운영",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-07-03T03:55:25.352Z",
+      "feature": "AX챔피언 운영",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-07-03T03:55:40.387Z",
+      "feature": "AX챔피언 운영",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-07-03T03:55:47.742Z",
+      "feature": "AX챔피언 운영",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-07-03T03:55:52.049Z",
+      "feature": "AX챔피언 운영",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-07-03T03:56:12.342Z",
+      "feature": "regenerate-report",
       "phase": "do",
       "action": "updated"
     }
