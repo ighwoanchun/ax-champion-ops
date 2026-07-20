@@ -62,6 +62,13 @@ const envSchema = z.object({
   // 모델 기본값: gemini-2.5-pro (긴 출력 안정, 한국어 우수, 1M context).
   GEMINI_API_KEY: z.string().optional(),
   GEMINI_MODEL: z.string().default("gemini-2.5-pro").optional(),
+
+  // ── 마무리 리포트 (종료 설문 기반, 관리자 수동 트리거) ──
+  // 운영 시트(GOOGLE_SHEETS_ID)와 별도. 기수마다 새 설문 사본을 쓰므로 매 기수 종료 시 갱신 필요.
+  SURVEY_SHEET_ID: z.string().optional(),
+  SURVEY_SHEET_TAB: z.string().default("설문지 응답 시트1").optional(),
+  // 이전 기수 마무리 리포트 페이지 ID(콤마 구분). 있으면 기수 간 비교 섹션 생성.
+  CONFLUENCE_PREVIOUS_FINAL_REPORT_IDS: z.string().optional(),
 });
 
 export type Env = z.infer<typeof envSchema>;

@@ -154,6 +154,28 @@ export async function appendWeeklyReport(row: {
   });
 }
 
+/**
+ * 종료 설문 응답 시트 원본 조회 (헤더 행 + 데이터 행).
+ * GOOGLE_SHEETS_ID(운영 시트)와 별도인 SURVEY_SHEET_ID를 사용 — 기수마다 새 설문 사본을 쓰므로.
+ * SA 이메일(GOOGLE_SERVICE_ACCOUNT_EMAIL)에 해당 시트 조회 권한이 있어야 한다.
+ */
+export async function readSurveyResponses(): Promise<{ headers: string[]; rows: string[][] }> {
+  const e = env();
+  if (!e.SURVEY_SHEET_ID) {
+    throw new Error("[sheets] SURVEY_SHEET_ID not configured");
+  }
+  const tab = e.SURVEY_SHEET_TAB || "설문지 응답 시트1";
+  const r = await sheets().spreadsheets.values.get({
+    spreadsheetId: e.SURVEY_SHEET_ID,
+    range: `${tab}!A1:ZZ`,
+  });
+  const values = r.data.values ?? [];
+  const [headerRow, ...dataRows] = values;
+  const headers = (headerRow ?? []).map((h) => String(h ?? "").trim());
+  const rows = dataRows.map((row) => headers.map((_, i) => String(row[i] ?? "").trim()));
+  return { headers, rows };
+}
+
 export const SHEETS = {
   PARTICIPANTS: SHEET_PARTICIPANTS,
   ATTENDANCE: SHEET_ATTENDANCE,
