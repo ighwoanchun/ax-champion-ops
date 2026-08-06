@@ -1,6 +1,6 @@
 {
   "version": "2.0",
-  "lastUpdated": "2026-07-16T05:44:44.435Z",
+  "lastUpdated": "2026-07-30T00:34:07.721Z",
   "activeFeatures": [
     "AX챔피언 운영",
     "health",
@@ -11,7 +11,9 @@
     "post-page",
     "share-report",
     "regenerate-report",
-    "final-report"
+    "final-report",
+    "아이패밀리SC",
+    "[...slug]"
   ],
   "primaryFeature": "AX챔피언 운영",
   "features": {
@@ -144,6 +146,32 @@
         "lastUpdated": "2026-07-13T23:57:59.088Z"
       },
       "lastFile": "/Users/ighwoanchun/claude_test/AX챔피언 운영/app/api/admin/final-report/route.ts"
+    },
+    "아이패밀리SC": {
+      "phase": "do",
+      "phaseNumber": 3,
+      "matchRate": null,
+      "iterationCount": 0,
+      "requirements": [],
+      "documents": {},
+      "timestamps": {
+        "started": "2026-07-30T00:22:56.970Z",
+        "lastUpdated": "2026-07-30T00:22:56.970Z"
+      },
+      "lastFile": "/Users/ighwoanchun/claude_test/AX챔피언 운영/app/아이패밀리SC/route.ts"
+    },
+    "[...slug]": {
+      "phase": "do",
+      "phaseNumber": 3,
+      "matchRate": null,
+      "iterationCount": 0,
+      "requirements": [],
+      "documents": {},
+      "timestamps": {
+        "started": "2026-07-30T00:34:07.721Z",
+        "lastUpdated": "2026-07-30T00:34:07.721Z"
+      },
+      "lastFile": "/Users/ighwoanchun/claude_test/AX챔피언 운영/app/[...slug]/route.ts"
     }
   },
   "pipeline": {
@@ -154,7 +182,7 @@
   "session": {
     "startedAt": "2026-05-07T02:07:04.849Z",
     "onboardingCompleted": false,
-    "lastActivity": "2026-07-16T05:44:44.435Z"
+    "lastActivity": "2026-07-30T00:34:07.721Z"
   },
   "history": [
     {
@@ -964,6 +992,18 @@
     {
       "timestamp": "2026-07-16T05:44:44.435Z",
       "feature": "AX챔피언 운영",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-07-30T00:22:56.970Z",
+      "feature": "아이패밀리SC",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-07-30T00:34:07.721Z",
+      "feature": "[...slug]",
       "phase": "do",
       "action": "updated"
     }
